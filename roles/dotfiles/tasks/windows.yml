@@ -55,6 +55,11 @@
   register: dotfiles_win_link
   when: not (ansible_check_mode and not dotfiles_win_repo.stat.exists)
 
+- name: Create .config\git
+  ansible.windows.win_file:
+    path: "{{ dotfiles_windows_target }}\\.config\\git"
+    state: directory
+
 - name: Write OS-specific git settings
   ansible.windows.win_copy:
     dest: "{{ dotfiles_windows_target }}\\.config\\git\\os.gitconfig"
