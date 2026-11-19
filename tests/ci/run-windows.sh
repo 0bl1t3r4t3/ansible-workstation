@@ -18,5 +18,5 @@ grep -Eq 'changed=0 +unreachable=0 +failed=0' /tmp/run2.log || { echo "Not idemp
 # Reload PATH first: sshd's environment predates the winget installs, like an old terminal.
 # shellcheck disable=SC2016
 ansible "${inv[@]}" windows -m ansible.windows.win_shell -a \
-  '$env:PATH = [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH", "User"); (Get-Item $env:USERPROFILE\.config\starship.toml).LinkType; (Get-Command starship).Source; git config --global credential.helper'
+  '$env:PATH = [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH", "User"); (Get-Item $env:USERPROFILE\.config\starship.toml).LinkType; (Get-Command starship).Source; git config --global --includes credential.helper'
 echo "CI OK"
