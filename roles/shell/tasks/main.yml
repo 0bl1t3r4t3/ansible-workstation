@@ -32,14 +32,14 @@
       register: shell_etc_shells
 
     # Only uses sudo when the line is actually missing.
-    - name: Add to /etc/shells {{ shell_path }}
+    - name: Allow the login shell in /etc/shells
       ansible.builtin.lineinfile:
         path: /etc/shells
         line: "{{ shell_path }}"
       become: true
       when: shell_path not in (shell_etc_shells.content | b64decode).splitlines()
 
-    - name: Change login shell to {{ shell_path }}
+    - name: Change the login shell
       ansible.builtin.user:
         name: "{{ ansible_facts.user_id }}"
         shell: "{{ shell_path }}"
