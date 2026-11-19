@@ -15,5 +15,6 @@ grep -Eq 'changed=0 +unreachable=0 +failed=0' /tmp/run2.log || { echo "Not idemp
 home=$(python3 -c 'import os, pwd; print(pwd.getpwuid(os.getuid()).pw_dir)')
 test -L "${home}/.bashrc" || { echo "${home}/.bashrc is not linked" >&2; exit 1; }
 test -d "${home}/.asdf/installs/shfmt/3.12.0" || { echo "asdf did not install shfmt" >&2; exit 1; }
-PATH=${home}/.local/bin:/opt/homebrew/bin:${PATH} ASDF_DATA_DIR=${home}/.asdf "${home}/.asdf/shims/shfmt" --version
+# Run from home, where ~/.tool-versions pins the version.
+(cd "${home}" && PATH=${home}/.local/bin:/opt/homebrew/bin:${PATH} ASDF_DATA_DIR=${home}/.asdf "${home}/.asdf/shims/shfmt" --version)
 echo "CI OK"

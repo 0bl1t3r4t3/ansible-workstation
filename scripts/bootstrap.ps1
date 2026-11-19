@@ -6,8 +6,8 @@
 
 .DESCRIPTION
   1. Installs and starts the OpenSSH Server, with PowerShell as its shell and key-only logins.
-     Windows 11 (22H2+): sshd listens on localhost only and WSL uses mirrored networking.
-     Windows 10: sshd only accepts connections from the WSL network (172.16.0.0/12).
+     The firewall only lets in this PC and WSL's network (127.0.0.1, 172.16.0.0/12), which
+     works with both WSL networking modes (NAT and mirrored). -AllowRemote opens it to the LAN.
   2. Creates an SSH key for Ansible and authorizes it for this (administrator) account.
   3. Installs WSL with a Linux distribution (a reboot may be needed).
   Then, inside WSL, run scripts/bootstrap-wsl.sh.
@@ -44,7 +44,6 @@ New-ItemProperty -Path 'HKLM:\SOFTWARE\OpenSSH' -Name DefaultShell -PropertyType
 $config = "$env:ProgramData\ssh\sshd_config"
 $text = Get-Content -LiteralPath $config -Raw
 $settings = [ordered]@{ PasswordAuthentication = 'no'; PubkeyAuthentication = 'yes' }
-if ($mirrored -and -not $AllowRemote) { $settings.ListenAddress = '127.0.0.1' }
 foreach ($key in $settings.Keys) {
     $line = "$key $($settings[$key])"
     if ($text -match "(?m)^\s*#?\s*$key\s+.*$") { $text = $text -replace "(?m)^\s*#?\s*$key\s+.*$", $line }
@@ -58,10 +57,9 @@ if (-not $rule) {
     $rule = New-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -DisplayName 'OpenSSH Server (sshd)' `
         -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
 }
-if (-not $mirrored -and -not $AllowRemote) {
-    # Windows 10: WSL reaches Windows through a NAT network in 172.16.0.0/12.
-    Set-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -RemoteAddress '172.16.0.0/12'
-}
+# WSL's adapter is usually on the Public profile, so the rule must cover all profiles.
+$remote = if ($AllowRemote) { 'Any' } else { @('127.0.0.1', '172.16.0.0/12') }
+Set-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -Enabled True -Profile Any -RemoteAddress $remote
 
 # --- 2. SSH key for Ansible --------------------------------------------------
 Step 'SSH key for Ansible'
@@ -94,6 +92,9 @@ if (-not $SkipWsl) {
     }
     $env:WSL_UTF8 = '1'
     $installed = @(& wsl.exe --list --quiet 2>$null) | ForEach-Object { $_.Trim() }
+    if ($LASTEXITCODE -eq 0 -and $installed) {
+        Write-Host '    WSL already installed. Run "wsl --shutdown" once so new settings apply.'
+    }
     if ($LASTEXITCODE -ne 0 -or $installed -notcontains $Distribution) {
         & wsl.exe --install --distribution $Distribution --no-launch
     }
