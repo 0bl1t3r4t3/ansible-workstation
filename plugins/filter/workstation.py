@@ -10,7 +10,6 @@ short_description: Helper filters for the workstation roles
 description:
   - C(os_packages) translates generic package names to the names used by an OS family.
   - C(parse_tool_versions) turns the text of an asdf C(.tool-versions) file into a dict.
-  - C(asdf_not_installed) lists tools that C(asdf current) reports as not installed.
 """
 
 
@@ -42,20 +41,6 @@ def parse_tool_versions(text):
     return tools
 
 
-def asdf_not_installed(text):
-    """Names of tools that ``asdf current`` reports as not installed.
-
-    asdf >= 0.16 prints ``Name Version Source Installed`` with true/false in the
-    last column.
-    """
-    names = []
-    for line in (text or "").splitlines()[1:]:
-        parts = line.split()
-        if len(parts) >= 4 and parts[-1] == "false":
-            names.append(parts[0])
-    return sorted(names)
-
-
 class FilterModule:
     """Ansible filter plugin entry point."""
 
@@ -63,5 +48,4 @@ class FilterModule:
         return {
             "os_packages": os_packages,
             "parse_tool_versions": parse_tool_versions,
-            "asdf_not_installed": asdf_not_installed,
         }

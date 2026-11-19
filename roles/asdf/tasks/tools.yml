@@ -18,26 +18,23 @@
   loop: "{{ asdf_tools.keys() | difference(asdf_plugins.stdout_lines | map('trim')) | sort }}"
   changed_when: true
 
-# `asdf current` columns: Name Version Source Installed(true/false)
-- name: Find versions that are not installed
-  ansible.builtin.command: asdf current
-  args:
-    chdir: "{{ asdf_tool_versions | dirname }}"
-  environment: "{{ asdf_env }}"
-  changed_when: false
-  failed_when: false
-  check_mode: false
-  register: asdf_current
+# Check install folders directly: asdf's `current`/`list` output changes between versions.
+- name: Check which versions are installed
+  ansible.builtin.stat:
+    path: "{{ asdf_data_dir }}/installs/{{ item.key }}/{{ item.value }}"
+  loop: "{{ asdf_tools | dict2items }}"
+  loop_control:
+    label: "{{ item.key }} {{ item.value }}"
+  register: asdf_installed
   when: asdf_install_versions | bool
 
 - name: Install missing versions
   ansible.builtin.command:
-    argv: [asdf, install, "{{ item }}", "{{ asdf_tools[item] }}"]
+    argv: [asdf, install, "{{ item.item.key }}", "{{ item.item.value }}"]
     chdir: "{{ asdf_tool_versions | dirname }}"
   environment: "{{ asdf_env }}"
-  # If `asdf current` failed (e.g. plugins only just added in check mode), try them all.
-  loop: >-
-    {{ (asdf_current.stdout | bwhitehead.workstation.asdf_not_installed)
-       if asdf_current.rc | default(1) == 0 else asdf_tools.keys() | sort }}
+  loop: "{{ asdf_installed.results | rejectattr('skipped', 'defined') | rejectattr('stat.exists') }}"
+  loop_control:
+    label: "{{ item.item.key }} {{ item.item.value }}"
   changed_when: true
   when: asdf_install_versions | bool

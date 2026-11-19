@@ -11,5 +11,7 @@ export ANSIBLE_FORCE_COLOR=1
 ansible-playbook -i tests/ci/inventory.yml playbooks/workstation.yml
 ansible-playbook -i tests/ci/inventory.yml playbooks/workstation.yml | tee /tmp/run2.log
 grep -Eq 'changed=0 +unreachable=0 +failed=0' /tmp/run2.log || { echo "Not idempotent" >&2; exit 1; }
-test -L "$HOME/.bashrc" && "$HOME/.asdf/shims/shfmt" --version
+test -L "$HOME/.bashrc"
+test -d "$HOME/.asdf/installs/shfmt/3.12.0" || { echo "asdf did not install shfmt" >&2; exit 1; }
+"$HOME/.asdf/shims/shfmt" --version
 echo "CI OK"

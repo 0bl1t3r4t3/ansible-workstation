@@ -23,17 +23,5 @@ def test_parse_tool_versions():
     assert f.parse_tool_versions("") == {}
 
 
-def test_asdf_not_installed():
-    out = (
-        "Name                 Version         Source                    Installed\n"
-        "python               3.12.7          /home/u/.tool-versions    true\n"
-        "nodejs               24.5.0          /home/u/.tool-versions    false\n"
-        "awscli               2.0.0           /home/u/.tool-versions    false\n"
-    )
-    assert f.asdf_not_installed(out) == ["awscli", "nodejs"]
-    assert f.asdf_not_installed("") == []
-
-
 def test_filter_module_exports():
-    assert set(f.FilterModule().filters()) == {
-        "os_packages", "parse_tool_versions", "asdf_not_installed"}
+    assert set(f.FilterModule().filters()) == {"os_packages", "parse_tool_versions"}
