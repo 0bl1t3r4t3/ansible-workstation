@@ -13,3 +13,11 @@ shell_paths:
 # binary is installed into shell_bin_dir when `starship` is not already on PATH.
 shell_starship: true
 shell_bin_dir: "{{ ansible_facts.user_dir }}/.local/bin"
+
+# Windows: PowerShell is the shell. $PROFILE dot-sources the dotfiles profile.
+shell_windows_shared_profile: "{{ ansible_facts.env.USERPROFILE | default('') }}\\.config\\powershell\\Microsoft.PowerShell_profile.ps1"
+shell_windows_pwsh: 'C:\Program Files\PowerShell\7\pwsh.exe'
+# Windows Terminal: default to PowerShell 7 and a Nerd Font (Starship symbols).
+shell_windows_terminal: true
+shell_windows_terminal_profile: "{574e775e-4f2a-5b96-ac1e-a2962a402336}"   # PowerShell 7's fixed GUID
+shell_windows_terminal_font: JetBrainsMono Nerd Font

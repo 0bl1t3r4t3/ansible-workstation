@@ -1,0 +1,22 @@
+---
+- name: Load the shared PowerShell profile from $PROFILE
+  ansible.windows.win_powershell:
+    script: "{{ lookup('ansible.builtin.file', 'powershell-profile.ps1') }}"
+    parameters:
+      SharedProfile: "{{ shell_windows_shared_profile }}"
+
+- name: Check for PowerShell 7
+  ansible.windows.win_stat:
+    path: "{{ shell_windows_pwsh }}"
+  register: shell_pwsh
+
+- name: Configure Windows Terminal
+  ansible.windows.win_powershell:
+    executable: "{{ shell_windows_pwsh }}"
+    script: "{{ lookup('ansible.builtin.file', 'windows-terminal.ps1') }}"
+    parameters:
+      DefaultProfile: "{{ shell_windows_terminal_profile }}"
+      FontFace: "{{ shell_windows_terminal_font }}"
+  when:
+    - shell_windows_terminal | bool
+    - shell_pwsh.stat.exists

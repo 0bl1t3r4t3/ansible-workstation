@@ -1,0 +1,15 @@
+---
+# Also used by other roles: include_role tasks_from=winget with packages_winget_ids set.
+- name: Install winget packages
+  ansible.windows.win_powershell:
+    script: "{{ lookup('ansible.builtin.file', 'winget.ps1') }}"
+    parameters:
+      Ids: "{{ packages_winget_ids }}"
+      Upgrade: "{{ packages_upgrade | bool }}"
+  register: packages_winget_result
+  when: packages_winget_ids | length > 0
+
+- name: Note required reboot
+  ansible.builtin.debug:
+    msg: "winget: a reboot is required to finish installing {{ packages_winget_result.result.installed | join(', ') }}"
+  when: packages_winget_result.result.reboot_required | default(false)

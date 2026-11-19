@@ -3,3 +3,5 @@
 __pycache__/
 .DS_Store
 .ansible/
+# Written by scripts/bootstrap-wsl.sh (this machine's Windows host)
+inventory/local.yml

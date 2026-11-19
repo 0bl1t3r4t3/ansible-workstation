@@ -1,0 +1,11 @@
+---
+# Explorer restarts itself automatically; only done when a flagged setting changed.
+- name: Restart Explorer
+  ansible.windows.win_powershell:
+    script: |
+      $p = Get-Process -Name explorer -ErrorAction SilentlyContinue
+      if ($p) { $p | Stop-Process -Force; $Ansible.Changed = $true } else { $Ansible.Changed = $false }
+  when: >-
+    windows_settings_result.results | selectattr('changed')
+    | selectattr('item.restart_explorer', 'defined') | selectattr('item.restart_explorer')
+    | list | length > 0

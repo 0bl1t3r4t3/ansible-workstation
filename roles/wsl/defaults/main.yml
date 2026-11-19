@@ -1,0 +1,7 @@
+---
+# WSL distributions to install (names from `wsl --list --online`). [] = don't install any.
+wsl_distributions: [Ubuntu]
+# Settings for the [wsl2] section of %USERPROFILE%\.wslconfig. {} = leave the file alone.
+# mirrored networking lets WSL reach Windows services (like sshd) on localhost (Windows 11 22H2+).
+# Changes apply after `wsl --shutdown`; the role never does that (it may be running inside WSL).
+wsl_config: {}

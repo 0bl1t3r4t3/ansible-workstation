@@ -1,0 +1,1 @@
+$env:WORKSTATION_FIXTURE = "1"

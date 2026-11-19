@@ -1,0 +1,13 @@
+---
+# Registry values: {path, name, data, type (dword|qword|string|expandstring|multistring|binary)}
+# Optional per item: restart_explorer: true (refreshes Explorer/taskbar after a change).
+# Example:
+#   - path: HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+#     name: HideFileExt
+#     data: 0
+#     type: dword
+#     restart_explorer: true
+windows_settings_registry: []
+
+# Developer Mode: lets non-admin users create symlinks, enables sideloading and dev tools.
+windows_settings_developer_mode: true

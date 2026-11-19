@@ -1,0 +1,8 @@
+---
+dotfiles_git_os_header: "# Managed by bwhitehead.workstation (dotfiles role). OS-specific git settings.\n"
+# git reads extra config from the environment (git >= 2.31), so the token is never stored.
+dotfiles_git_auth_env: >-
+  {{ {} if dotfiles_git_token | length == 0 else {
+       'GIT_CONFIG_COUNT': '1',
+       'GIT_CONFIG_KEY_0': 'http.https://github.com/.extraHeader',
+       'GIT_CONFIG_VALUE_0': 'Authorization: Basic ' ~ ('x-access-token:' ~ dotfiles_git_token) | b64encode } }}

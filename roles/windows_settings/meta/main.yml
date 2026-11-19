@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  author: Brian Whitehead
+  description: Apply Windows registry settings (Explorer, theme, ...) and enable Developer Mode.
+  license: MIT
+  min_ansible_version: "2.16"
+  platforms:
+    - {name: Windows, versions: [all]}
+dependencies: []

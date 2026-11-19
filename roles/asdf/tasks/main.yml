@@ -8,6 +8,11 @@
 - name: Install asdf release binary
   when: ansible_facts.system == 'Linux'
   block:
+    - name: Install plugin prerequisites
+      ansible.builtin.package:
+        name: "{{ asdf_linux_dependencies }}"
+      become: true
+
     - name: Create {{ asdf_bin_dir }}
       ansible.builtin.file:
         path: "{{ asdf_bin_dir }}"

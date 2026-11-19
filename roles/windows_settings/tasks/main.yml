@@ -1,0 +1,20 @@
+---
+- name: Enable Developer Mode
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock
+    name: AllowDevelopmentWithoutDevLicense
+    data: 1
+    type: dword
+  when: windows_settings_developer_mode | bool
+
+- name: Apply registry settings
+  ansible.windows.win_regedit:
+    path: "{{ item.path }}"
+    name: "{{ item.name }}"
+    data: "{{ item.data }}"
+    type: "{{ item.type | default('dword') }}"
+  loop: "{{ windows_settings_registry }}"
+  loop_control:
+    label: "{{ item.path | win_basename }}\\{{ item.name }}={{ item.data }}"
+  register: windows_settings_result
+  notify: Restart Explorer

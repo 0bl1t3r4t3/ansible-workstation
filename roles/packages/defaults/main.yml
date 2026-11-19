@@ -2,6 +2,8 @@
 # Cross-OS packages by generic name; translated per OS family through
 # packages_default_name_map (vars/main.yml) merged with packages_name_map.
 packages_common: []
+# Default winget IDs list used by tasks/winget.yml when included from other roles
+packages_winget_ids: []
 
 # Extra or overriding translations: {generic: {Darwin|Debian|RedHat|Archlinux|Suse: name}}.
 # An empty string skips the package on that OS family.
@@ -19,6 +21,10 @@ packages_debian: []     # Debian, Ubuntu, ...
 packages_redhat: []     # Fedora, RHEL, Rocky, Alma, ...
 packages_archlinux: []
 packages_suse: []
+
+# Windows: winget package IDs (`winget search <name>` shows the ID). Names in
+# packages_common are only installed on Windows when they have a Windows mapping.
+packages_winget: []
 
 # Linux Flatpak apps (GUI apps; the Linux counterpart of casks)
 packages_flatpaks: []

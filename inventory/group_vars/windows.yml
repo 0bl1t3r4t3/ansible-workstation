@@ -1,0 +1,44 @@
+---
+# Windows workstations (reached over SSH from WSL; see scripts/bootstrap.ps1).
+# Command-line tools from packages_common with a Windows mapping (git, jq, ripgrep,
+# fd, fzf, bat, shellcheck, shfmt, starship, ...) are installed too.
+packages_winget:
+  # Shell and terminal
+  - Microsoft.PowerShell
+  - Microsoft.WindowsTerminal
+  - DEVCOM.JetBrainsMonoNerdFont     # font for Starship symbols in Windows Terminal
+  # Editors and dev tools
+  - Microsoft.VisualStudioCode
+  - GNU.Emacs
+  - GitHub.cli
+  - Hashicorp.Vagrant
+  - Docker.DockerDesktop
+  - DBBrowserForSQLite.DBBrowserForSQLite
+  # Counterparts of the Mac's casks
+  - AgileBits.1Password
+  - AgileBits.1Password.CLI
+  - GnuPG.Gpg4win
+  - OBSProject.OBSStudio
+  - Cloudflare.Warp
+  - 7zip.7zip
+
+# Matches the main Mac: dark mode. Plus visible file extensions.
+windows_settings_registry:
+  - path: HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+    name: HideFileExt
+    data: 0
+    type: dword
+    restart_explorer: true
+  - path: HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize
+    name: AppsUseLightTheme
+    data: 0
+    type: dword
+  - path: HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize
+    name: SystemUsesLightTheme
+    data: 0
+    type: dword
+    restart_explorer: true
+
+wsl_distributions: [Ubuntu]
+wsl_config:
+  networkingMode: mirrored

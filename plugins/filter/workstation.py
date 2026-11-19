@@ -13,17 +13,18 @@ description:
 """
 
 
-def os_packages(packages, os_family, name_map=None):
+def os_packages(packages, os_family, name_map=None, require_mapping=False):
     """Translate generic package names for ``os_family``.
 
     ``name_map`` is ``{generic: {OsFamily: real_name}}``. A missing entry keeps
-    the generic name; an empty string skips the package on that OS.
+    the generic name (or skips it when ``require_mapping`` is true, e.g. for
+    winget IDs); an empty string skips the package on that OS.
     Order is kept and duplicates are dropped.
     """
     name_map = name_map or {}
     out, seen = [], set()
     for pkg in packages or []:
-        name = (name_map.get(pkg) or {}).get(os_family, pkg)
+        name = (name_map.get(pkg) or {}).get(os_family, None if require_mapping else pkg)
         if name and name not in seen:
             seen.add(name)
             out.append(name)

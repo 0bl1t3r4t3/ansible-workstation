@@ -1,4 +1,5 @@
 ---
+# Hosts can be macOS, Linux (including WSL) or Windows (over SSH, shell=powershell).
 - name: Set up workstation
   hosts: all
   gather_facts: true
@@ -11,6 +12,13 @@
       tags: [shell]
     - role: bwhitehead.workstation.asdf
       tags: [asdf]
+      when: ansible_facts.os_family != 'Windows'   # asdf has no Windows support; WSL gets it
     - role: bwhitehead.workstation.macos_defaults
       tags: [macos]
       when: ansible_facts.os_family == 'Darwin'
+    - role: bwhitehead.workstation.windows_settings
+      tags: [windows]
+      when: ansible_facts.os_family == 'Windows'
+    - role: bwhitehead.workstation.wsl
+      tags: [windows, wsl]
+      when: ansible_facts.os_family == 'Windows'

@@ -1,0 +1,5 @@
+---
+- name: Install winget packages
+  ansible.builtin.include_tasks: winget.yml
+  vars:
+    packages_winget_ids: "{{ (packages_resolved + packages_winget) | unique }}"

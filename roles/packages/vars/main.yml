@@ -1,14 +1,28 @@
 ---
 # Known name differences. Generic names follow Homebrew where possible.
+# Windows values are winget IDs; on Windows only mapped names are installed.
 packages_default_name_map:
   bash-completion:
     Darwin: bash-completion@2
   fd:
     Debian: fd-find
     RedHat: fd-find
+    Windows: sharkdp.fd
   shellcheck:
     RedHat: ShellCheck
     Suse: ShellCheck
+    Windows: koalaman.shellcheck
+  git: {Windows: Git.Git}       # includes Git Bash and git-lfs
+  jq: {Windows: jqlang.jq}
+  ripgrep: {Windows: BurntSushi.ripgrep.MSVC}
+  fzf: {Windows: junegunn.fzf}
+  bat: {Windows: sharkdp.bat}
+  direnv: {Windows: direnv.direnv}
+  shfmt: {Windows: mvdan.shfmt}
+  gitleaks: {Windows: Gitleaks.Gitleaks}
+  starship: {Windows: Starship.Starship}
+  gh: {Windows: GitHub.cli}
+  wget: {Windows: JernejSimoncic.Wget}
   pipx:
     Archlinux: python-pipx
     Suse: python3-pipx

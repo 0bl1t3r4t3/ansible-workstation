@@ -1,6 +1,12 @@
 ---
+- name: Set up PowerShell and Windows Terminal
+  ansible.builtin.include_tasks: windows.yml
+  when: ansible_facts.os_family == 'Windows'
+
 - name: Set the login shell
-  when: shell_login | length > 0
+  when:
+    - shell_login | length > 0
+    - ansible_facts.os_family != 'Windows'
   block:
     - name: Find {{ shell_login }}
       ansible.builtin.stat:

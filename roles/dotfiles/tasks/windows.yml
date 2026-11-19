@@ -1,0 +1,61 @@
+---
+- name: Check for Git for Windows
+  ansible.windows.win_stat:
+    path: "{{ dotfiles_windows_git }}"
+  register: dotfiles_win_git
+
+- name: Install Git for Windows
+  ansible.builtin.include_role:
+    name: bwhitehead.workstation.packages
+    tasks_from: winget.yml
+  vars:
+    packages_winget_ids: [Git.Git]
+  when:
+    - dotfiles_install_deps | bool
+    - not dotfiles_win_git.stat.exists
+
+- name: Check for an existing clone
+  ansible.windows.win_stat:
+    path: "{{ dotfiles_windows_dest }}\\.git"
+  register: dotfiles_win_repo
+
+# sshd's environment predates Git's install, so call git by full path.
+- name: Clone dotfiles
+  ansible.windows.win_command:
+    argv:
+      - "{{ dotfiles_windows_git }}"
+      - clone
+      - --branch
+      - "{{ dotfiles_version }}"
+      - "{{ dotfiles_repo }}"
+      - "{{ dotfiles_windows_dest }}"
+  environment: "{{ dotfiles_git_auth_env }}"
+  no_log: "{{ dotfiles_git_token | length > 0 }}"
+  when: not dotfiles_win_repo.stat.exists
+
+- name: Update dotfiles
+  ansible.windows.win_command:
+    argv: ["{{ dotfiles_windows_git }}", -C, "{{ dotfiles_windows_dest }}", pull, --ff-only]
+  environment: "{{ dotfiles_git_auth_env }}"
+  no_log: "{{ dotfiles_git_token | length > 0 }}"
+  register: dotfiles_win_pull
+  changed_when: "'Already up to date' not in dotfiles_win_pull.stdout"
+  when:
+    - dotfiles_win_repo.stat.exists
+    - dotfiles_update | bool
+
+- name: Link dotfiles into {{ dotfiles_windows_target }}
+  ansible.windows.win_powershell:
+    script: "{{ lookup('ansible.builtin.file', 'link-dotfiles.ps1') }}"
+    parameters:
+      Source: "{{ dotfiles_windows_dest }}"
+      Packages: "{{ dotfiles_windows_packages }}"
+      Target: "{{ dotfiles_windows_target }}"
+      BackupDir: "{{ dotfiles_windows_backup_dir }}"
+  register: dotfiles_win_link
+  when: not (ansible_check_mode and not dotfiles_win_repo.stat.exists)
+
+- name: Write OS-specific git settings
+  ansible.windows.win_copy:
+    dest: "{{ dotfiles_windows_target }}\\.config\\git\\os.gitconfig"
+    content: "{{ dotfiles_git_os_header }}{{ dotfiles_git_os_config['Windows'] }}"

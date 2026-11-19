@@ -17,6 +17,11 @@ def test_os_packages_maps_skips_and_dedupes():
     assert f.os_packages(None, "Darwin") == []
 
 
+def test_os_packages_require_mapping():
+    win = {"git": {"Windows": "Git.Git"}, "fd": {"Windows": ""}}
+    assert f.os_packages(["git", "fd", "jq"], "Windows", win, require_mapping=True) == ["Git.Git"]
+
+
 def test_parse_tool_versions():
     text = "# comment\npython 3.12.7 3.11.9\n\nnodejs 24.5.0  # lts\nbroken\n"
     assert f.parse_tool_versions(text) == {"python": "3.12.7", "nodejs": "24.5.0"}

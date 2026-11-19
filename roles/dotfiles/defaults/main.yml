@@ -14,3 +14,27 @@ dotfiles_install_deps: true
 # are moved here first. false = stop and report them instead.
 dotfiles_backup_conflicts: true
 dotfiles_backup_dir: "{{ dotfiles_target }}/.dotfiles-backup/{{ ansible_facts.date_time.iso8601_basic_short }}"
+dotfiles_windows_backup_dir: "{{ dotfiles_windows_target }}\\.dotfiles-backup\\{{ ansible_facts.date_time.iso8601_basic_short }}"
+
+# Token for cloning a private repo over HTTPS. Used only for the clone/pull (sent as
+# an HTTP header through git's environment), never written to disk.
+# bootstrap-wsl.sh sets DOTFILES_GIT_TOKEN from `gh auth token`.
+dotfiles_git_token: "{{ lookup('ansible.builtin.env', 'DOTFILES_GIT_TOKEN') }}"
+
+# Written to ~/.config/git/os.gitconfig, which the dotfiles .gitconfig includes.
+dotfiles_git_os_config:
+  Darwin: |
+    [credential]
+      helper = osxkeychain
+  Windows: |
+    [credential]
+      helper = manager
+  default: |
+    [credential]
+      helper = cache --timeout=3600
+
+# Windows (no stow): these packages are linked into %USERPROFILE% with symlinks.
+dotfiles_windows_packages: [git, bash, powershell, starship]
+dotfiles_windows_dest: "{{ ansible_facts.env.USERPROFILE | default('') }}\\dotfiles"
+dotfiles_windows_target: "{{ ansible_facts.env.USERPROFILE | default('') }}"
+dotfiles_windows_git: 'C:\Program Files\Git\cmd\git.exe'

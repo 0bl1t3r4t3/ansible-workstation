@@ -1,0 +1,37 @@
+---
+- name: List installed WSL distributions
+  ansible.windows.win_command: wsl.exe --list --quiet
+  environment:
+    WSL_UTF8: "1"   # otherwise wsl.exe prints UTF-16
+  changed_when: false
+  failed_when: false
+  register: wsl_list
+
+- name: Install WSL distributions
+  ansible.windows.win_command:
+    argv: [wsl.exe, --install, --distribution, "{{ item }}", --no-launch]
+  environment:
+    WSL_UTF8: "1"
+  loop: >-
+    {{ wsl_distributions | reject('in', wsl_list.stdout_lines | default([]) | map('trim') | list) | list
+       if wsl_list.rc == 0 else wsl_distributions }}
+  register: wsl_install
+  changed_when: true
+
+- name: Note follow-up steps
+  ansible.builtin.debug:
+    msg: >-
+      Installed {{ wsl_install.results | map(attribute='item') | join(', ') }}. Reboot if Windows
+      asks, then open each distribution once from the Start menu to create its Linux user.
+  when: wsl_install.results | default([]) | selectattr('changed') | list | length > 0
+
+- name: Write .wslconfig
+  ansible.windows.win_copy:
+    dest: "{{ ansible_facts.env.USERPROFILE }}\\.wslconfig"
+    content: |
+      # Managed by bwhitehead.workstation (wsl role). Apply with: wsl --shutdown
+      [wsl2]
+      {% for key, value in wsl_config.items() %}
+      {{ key }}={{ value | string | lower if value is boolean else value }}
+      {% endfor %}
+  when: wsl_config | length > 0

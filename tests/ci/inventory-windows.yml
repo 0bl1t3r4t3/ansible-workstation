@@ -1,0 +1,17 @@
+---
+# Small Windows profile for CI. Used with the host file bootstrap-wsl.sh writes.
+all:
+  children:
+    windows:
+      vars:
+        packages_common: [git, jq, ripgrep]
+        packages_winget: [Starship.Starship]
+        dotfiles_repo: C:/dotfiles-fixture
+        dotfiles_windows_packages: [git, powershell, starship]
+        windows_settings_registry:
+          - path: HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+            name: HideFileExt
+            data: 0
+            type: dword
+            restart_explorer: true
+        wsl_distributions: []

@@ -16,6 +16,13 @@ jobs:
       - run: ansible-lint
       - run: python -m pytest -q tests/unit
       - run: shellcheck scripts/*.sh tests/ci/*.sh
+      - name: PowerShell lint
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          $r = Get-ChildItem roles, scripts, tests -Recurse -Filter *.ps1 | ForEach-Object { Invoke-ScriptAnalyzer -Path $_.FullName -Severity Error,Warning -ExcludeRule PSAvoidUsingWriteHost,PSUseShouldProcessForStateChangingFunctions }
+          $r | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
+          if ($r) { exit 1 }
 
   linux:
     needs: lint
@@ -43,3 +50,26 @@ jobs:
       - uses: actions/checkout@v4
       - run: brew install ansible
       - run: tests/ci/run.sh
+
+  windows:
+    needs: lint
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap Windows (sshd, key)
+        shell: powershell
+        run: .\scripts\bootstrap.ps1 -SkipWsl
+      - name: Fixture dotfiles repo
+        shell: pwsh
+        run: |
+          Copy-Item -Recurse tests/fixtures/dotfiles C:/dotfiles-fixture
+          git -C C:/dotfiles-fixture init -q -b main
+          git -C C:/dotfiles-fixture -c user.email=ci@example.invalid -c user.name=ci add -A
+          git -C C:/dotfiles-fixture -c user.email=ci@example.invalid -c user.name=ci commit -qm fixture
+      - uses: Vampire/setup-wsl@v5
+        with:
+          distribution: Ubuntu-24.04
+          additional-packages: git openssh-client python3-venv iproute2
+      - name: Configure Windows from WSL (twice)
+        shell: wsl-bash {0}
+        run: tests/ci/run-windows.sh
