@@ -1,0 +1,9 @@
+# Shell scripts and YAML must keep LF endings, even in a Windows checkout
+# (bash fails on CRLF: "/usr/bin/env: 'bash\r'").
+* text=auto
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.cfg text eol=lf
+tests/fixtures/** text eol=lf
+*.ps1 text eol=crlf

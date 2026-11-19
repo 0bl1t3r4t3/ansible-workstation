@@ -11,7 +11,9 @@ export ANSIBLE_FORCE_COLOR=1
 ansible-playbook -i tests/ci/inventory.yml playbooks/workstation.yml
 ansible-playbook -i tests/ci/inventory.yml playbooks/workstation.yml | tee /tmp/run2.log
 grep -Eq 'changed=0 +unreachable=0 +failed=0' /tmp/run2.log || { echo "Not idempotent" >&2; exit 1; }
-test -L "$HOME/.bashrc"
-test -d "$HOME/.asdf/installs/shfmt/3.12.0" || { echo "asdf did not install shfmt" >&2; exit 1; }
-"$HOME/.asdf/shims/shfmt" --version
+# The playbook uses the account's real home; CI containers point $HOME elsewhere.
+home=$(python3 -c 'import os, pwd; print(pwd.getpwuid(os.getuid()).pw_dir)')
+test -L "${home}/.bashrc" || { echo "~/.bashrc is not linked" >&2; exit 1; }
+test -d "${home}/.asdf/installs/shfmt/3.12.0" || { echo "asdf did not install shfmt" >&2; exit 1; }
+PATH=${home}/.local/bin:/opt/homebrew/bin:${PATH} ASDF_DATA_DIR=${home}/.asdf "${home}/.asdf/shims/shfmt" --version
 echo "CI OK"
