@@ -1,0 +1,15 @@
+---
+# Small, fast profile for CI (does not load inventory/group_vars).
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+      ansible_python_interpreter: "{{ ansible_playbook_python }}"
+  vars:
+    packages_common: [bash, bash-completion, git, stow, jq, ripgrep, fd, shellcheck, coreutils]
+    packages_homebrew_formulae: [starship]
+    dotfiles_repo: /tmp/dotfiles-fixture
+    asdf_plugin_urls:
+      shfmt: https://github.com/luizm/asdf-shfmt.git
+    macos_defaults_settings:
+      - {domain: com.apple.finder, key: ShowPathbar, type: bool, value: true, restart: [Finder]}

@@ -1,0 +1,18 @@
+---
+namespace: bwhitehead
+name: workstation
+version: 0.1.0
+readme: README.md
+authors:
+  - Brian Whitehead
+description: Set up a workstation on macOS and Linux - packages, dotfiles, login shell, asdf tools, OS settings.
+license:
+  - MIT
+tags: [workstation, dotfiles, macos, linux, homebrew, asdf]
+dependencies:
+  community.general: ">=9.0.0"
+repository: https://github.com/0bl1t3r4t3/ansible-workstation
+build_ignore:
+  - .collections
+  - .github
+  - "*.tar.gz"

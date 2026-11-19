@@ -1,0 +1,4 @@
+---
+asdf_env:
+  ASDF_DATA_DIR: "{{ asdf_data_dir }}"
+  PATH: "{{ asdf_bin_dir }}:{{ asdf_data_dir }}/shims:/opt/homebrew/bin:/usr/local/bin:{{ ansible_facts.env.PATH }}"

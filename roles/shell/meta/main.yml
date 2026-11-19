@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Brian Whitehead
+  description: Set the login shell (Homebrew bash on macOS) and install the Starship prompt.
+  license: MIT
+  min_ansible_version: "2.16"
+  platforms:
+    - {name: macOS, versions: [all]}
+    - {name: Debian, versions: [all]}
+    - {name: Ubuntu, versions: [all]}
+    - {name: Fedora, versions: [all]}
+    - {name: EL, versions: [all]}
+    - {name: ArchLinux, versions: [all]}
+dependencies: []

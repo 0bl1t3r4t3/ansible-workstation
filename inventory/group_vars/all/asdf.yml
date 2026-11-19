@@ -1,0 +1,26 @@
+---
+# asdf plugin sources (from `asdf plugin list --urls`).
+asdf_plugin_urls:
+  asdf-plugin-manager: https://github.com/asdf-community/asdf-plugin-manager.git
+  aws-vault: https://github.com/karancode/asdf-aws-vault.git
+  boundary: https://github.com/asdf-community/asdf-hashicorp.git
+  consul: https://github.com/asdf-community/asdf-hashicorp.git
+  direnv: https://github.com/asdf-community/asdf-direnv.git
+  levant: https://github.com/asdf-community/asdf-hashicorp.git
+  nodejs: https://github.com/asdf-vm/asdf-nodejs.git
+  nomad: https://github.com/asdf-community/asdf-hashicorp.git
+  okta-aws-cli: https://github.com/bennythejudge/asdf-plugin-okta-aws-cli.git
+  opentofu: https://github.com/virtualroot/asdf-opentofu.git
+  packer: https://github.com/asdf-community/asdf-hashicorp.git
+  pnpm: https://github.com/jonathanmorley/asdf-pnpm.git
+  python: https://github.com/danhper/asdf-python.git
+  sentinel: https://github.com/asdf-community/asdf-hashicorp.git
+  shfmt: https://github.com/luizm/asdf-shfmt.git
+  spacectl: https://github.com/bodgit/asdf-spacectl.git
+  terraform: https://github.com/asdf-community/asdf-hashicorp.git
+  terraform-ls: https://github.com/asdf-community/asdf-hashicorp.git
+  terraformer: https://github.com/grimoh/asdf-terraformer.git
+  tfc-agent: https://github.com/asdf-community/asdf-hashicorp.git
+  tool-versions-to-env: https://github.com/smartcontractkit/tool-versions-to-env-action.git
+  vault: https://github.com/asdf-community/asdf-hashicorp.git
+  waypoint: https://github.com/asdf-community/asdf-hashicorp.git

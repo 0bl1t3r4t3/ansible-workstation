@@ -1,0 +1,33 @@
+---
+- name: Check for Homebrew
+  ansible.builtin.stat:
+    path: "{{ packages_homebrew_prefix }}/bin/brew"
+  register: packages_brew
+
+- name: Require Homebrew
+  ansible.builtin.assert:
+    that: packages_brew.stat.exists
+    fail_msg: >-
+      Homebrew not found at {{ packages_homebrew_prefix }}. Run scripts/bootstrap.sh
+      (or install from https://brew.sh) first.
+    quiet: true
+
+- name: Add Homebrew taps
+  community.general.homebrew_tap:
+    name: "{{ packages_homebrew_taps }}"
+    path: "{{ packages_homebrew_prefix }}/bin"
+  when: packages_homebrew_taps | length > 0
+
+- name: Install Homebrew formulae
+  community.general.homebrew:
+    name: "{{ (packages_resolved + packages_homebrew_formulae) | unique }}"
+    state: "{{ packages_state }}"
+    path: "{{ packages_homebrew_prefix }}/bin"
+  when: (packages_resolved + packages_homebrew_formulae) | length > 0
+
+- name: Install Homebrew casks
+  community.general.homebrew_cask:
+    name: "{{ packages_homebrew_casks }}"
+    state: "{{ 'upgraded' if packages_upgrade | bool else 'present' }}"
+    path: "{{ packages_homebrew_prefix }}/bin"
+  when: packages_homebrew_casks | length > 0

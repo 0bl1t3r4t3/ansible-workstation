@@ -1,0 +1,19 @@
+---
+# Known name differences. Generic names follow Homebrew where possible.
+packages_default_name_map:
+  bash-completion:
+    Darwin: bash-completion@2
+  fd:
+    Debian: fd-find
+    RedHat: fd-find
+  shellcheck:
+    RedHat: ShellCheck
+    Suse: ShellCheck
+  pipx:
+    Archlinux: python-pipx
+    Suse: python3-pipx
+  # GNU userland: macOS only, Linux already has it
+  coreutils: {Debian: "", RedHat: "", Archlinux: "", Suse: ""}
+  gnu-sed: {Debian: "", RedHat: "", Archlinux: "", Suse: ""}
+  grep: {Debian: "", RedHat: "", Archlinux: "", Suse: ""}
+  util-linux: {Debian: "", RedHat: "", Archlinux: "", Suse: ""}

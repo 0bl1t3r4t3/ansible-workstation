@@ -1,0 +1,14 @@
+---
+- name: Apply macOS defaults
+  community.general.osx_defaults:
+    domain: "{{ item.domain }}"
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    host: "{{ item.host | default(omit) }}"
+  loop: "{{ macos_defaults_settings }}"
+  loop_control:
+    label: "{{ item.domain }} {{ item.key }}={{ item.value }}"
+  register: macos_defaults_result
+  notify: Restart affected macOS apps
+  when: ansible_facts.os_family == 'Darwin'

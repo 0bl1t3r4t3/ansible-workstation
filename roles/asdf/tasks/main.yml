@@ -1,0 +1,35 @@
+---
+- name: Install asdf (Homebrew)
+  community.general.homebrew:
+    name: asdf
+    path: "{{ '/opt/homebrew/bin' if ansible_facts.architecture == 'arm64' else '/usr/local/bin' }}"
+  when: ansible_facts.os_family == 'Darwin'
+
+- name: Install asdf release binary
+  when: ansible_facts.system == 'Linux'
+  block:
+    - name: Create {{ asdf_bin_dir }}
+      ansible.builtin.file:
+        path: "{{ asdf_bin_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Download and unpack asdf {{ asdf_version }}
+      ansible.builtin.unarchive:
+        src: >-
+          https://github.com/asdf-vm/asdf/releases/download/v{{ asdf_version }}/asdf-v{{
+          asdf_version }}-linux-{{ 'arm64' if ansible_facts.architecture in ['aarch64', 'arm64'] else 'amd64' }}.tar.gz
+        dest: "{{ asdf_bin_dir }}"
+        remote_src: true
+        creates: "{{ asdf_bin_dir }}/asdf"
+        mode: "0755"
+
+- name: Read {{ asdf_tool_versions }}
+  ansible.builtin.slurp:
+    src: "{{ asdf_tool_versions }}"
+  register: asdf_file
+  failed_when: false
+
+- name: Install plugins and tools
+  ansible.builtin.include_tasks: tools.yml
+  when: asdf_file.content is defined

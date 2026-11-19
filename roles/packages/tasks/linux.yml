@@ -1,0 +1,41 @@
+---
+- name: Refresh apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+  when: ansible_facts.os_family == 'Debian'
+
+- name: Collect native packages
+  ansible.builtin.set_fact:
+    packages_native: >-
+      {{ (packages_resolved + packages_linux
+          + lookup('vars', 'packages_' ~ ansible_facts.os_family | lower, default=[])) | unique }}
+
+- name: Install native packages
+  ansible.builtin.package:
+    name: "{{ packages_native }}"
+    state: "{{ packages_state }}"
+  become: true
+  when: packages_native | length > 0
+
+- name: Install Flatpak apps
+  when: packages_flatpaks | length > 0
+  block:
+    - name: Install flatpak
+      ansible.builtin.package:
+        name: flatpak
+      become: true
+
+    - name: Add Flatpak remote
+      community.general.flatpak_remote:
+        name: "{{ packages_flatpak_remote }}"
+        flatpakrepo_url: "{{ packages_flatpak_remote_url }}"
+        method: user
+
+    - name: Install Flatpaks
+      community.general.flatpak:
+        name: "{{ packages_flatpaks }}"
+        remote: "{{ packages_flatpak_remote }}"
+        method: user
+        state: "{{ 'latest' if packages_upgrade | bool else 'present' }}"

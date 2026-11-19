@@ -1,0 +1,15 @@
+---
+# Login shell: bash | zsh | fish. '' leaves it unchanged.
+shell_login: bash
+# Candidate paths per shell; the first one that exists is used.
+# macOS ships bash 3.2, so Homebrew's bash comes first.
+shell_paths:
+  bash: [/opt/homebrew/bin/bash, /usr/local/bin/bash, /usr/bin/bash, /bin/bash]
+  zsh: [/opt/homebrew/bin/zsh, /usr/local/bin/zsh, /usr/bin/zsh, /bin/zsh]
+  fish: [/opt/homebrew/bin/fish, /usr/local/bin/fish, /usr/bin/fish]
+
+# Starship prompt. On macOS, install it with the packages role (Homebrew).
+# On Linux, distro packages are often missing or old, so the official release
+# binary is installed into shell_bin_dir when `starship` is not already on PATH.
+shell_starship: true
+shell_bin_dir: "{{ ansible_facts.user_dir }}/.local/bin"

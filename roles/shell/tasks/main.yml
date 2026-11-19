@@ -1,0 +1,47 @@
+---
+- name: Set the login shell
+  when: shell_login | length > 0
+  block:
+    - name: Find {{ shell_login }}
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      loop: "{{ shell_paths[shell_login] }}"
+      register: shell_candidates
+
+    - name: Choose path for {{ shell_login }}
+      ansible.builtin.set_fact:
+        shell_path: >-
+          {{ (shell_candidates.results | selectattr('stat.exists') | map(attribute='item') | first)
+             | default('') }}
+
+    - name: Require {{ shell_login }}
+      ansible.builtin.assert:
+        that: shell_path | length > 0
+        fail_msg: "{{ shell_login }} not found in {{ shell_paths[shell_login] }}. Install it with the packages role."
+        quiet: true
+
+    - name: Read /etc/shells
+      ansible.builtin.slurp:
+        src: /etc/shells
+      register: shell_etc_shells
+
+    # Only uses sudo when the line is actually missing.
+    - name: Add to /etc/shells {{ shell_path }}
+      ansible.builtin.lineinfile:
+        path: /etc/shells
+        line: "{{ shell_path }}"
+      become: true
+      when: shell_path not in (shell_etc_shells.content | b64decode).splitlines()
+
+    - name: Change login shell to {{ shell_path }}
+      ansible.builtin.user:
+        name: "{{ ansible_facts.user_id }}"
+        shell: "{{ shell_path }}"
+      become: true
+      when: ansible_facts.user_shell != shell_path
+
+- name: Install Starship on Linux
+  ansible.builtin.include_tasks: starship-linux.yml
+  when:
+    - shell_starship | bool
+    - ansible_facts.system == 'Linux'

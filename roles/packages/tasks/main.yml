@@ -1,0 +1,16 @@
+---
+- name: Resolve package names for {{ ansible_facts.os_family }}
+  ansible.builtin.set_fact:
+    packages_resolved: >-
+      {{ packages_common | bwhitehead.workstation.os_packages(
+           ansible_facts.os_family,
+           packages_default_name_map | combine(packages_name_map, recursive=true)) }}
+    packages_state: "{{ 'latest' if packages_upgrade | bool else 'present' }}"
+
+- name: Install macOS packages
+  ansible.builtin.include_tasks: darwin.yml
+  when: ansible_facts.os_family == 'Darwin'
+
+- name: Install Linux packages
+  ansible.builtin.include_tasks: linux.yml
+  when: ansible_facts.system == 'Linux'

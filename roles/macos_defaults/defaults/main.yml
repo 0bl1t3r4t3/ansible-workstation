@@ -1,0 +1,7 @@
+---
+# Each item: {domain, key, type, value} (see community.general.osx_defaults).
+# Optional per item: host (e.g. currentHost), restart: [Dock, Finder, SystemUIServer].
+# Example:
+#   - {domain: com.apple.dock, key: autohide, type: bool, value: true, restart: [Dock]}
+#   - {domain: NSGlobalDomain, key: AppleShowAllExtensions, type: bool, value: true, restart: [Finder]}
+macos_defaults_settings: []

@@ -1,0 +1,16 @@
+---
+- name: Set up workstation
+  hosts: all
+  gather_facts: true
+  roles:
+    - role: bwhitehead.workstation.packages
+      tags: [packages]
+    - role: bwhitehead.workstation.dotfiles
+      tags: [dotfiles]
+    - role: bwhitehead.workstation.shell
+      tags: [shell]
+    - role: bwhitehead.workstation.asdf
+      tags: [asdf]
+    - role: bwhitehead.workstation.macos_defaults
+      tags: [macos]
+      when: ansible_facts.os_family == 'Darwin'

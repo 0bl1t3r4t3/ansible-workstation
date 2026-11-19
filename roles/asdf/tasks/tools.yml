@@ -1,0 +1,43 @@
+---
+- name: Parse tool versions
+  ansible.builtin.set_fact:
+    asdf_tools: "{{ asdf_file.content | b64decode | bwhitehead.workstation.parse_tool_versions }}"
+
+- name: List installed plugins
+  ansible.builtin.command: asdf plugin list
+  environment: "{{ asdf_env }}"
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  register: asdf_plugins
+
+- name: Add missing plugins
+  ansible.builtin.command:
+    argv: "{{ ['asdf', 'plugin', 'add', item] + ([asdf_plugin_urls[item]] if item in asdf_plugin_urls else []) }}"
+  environment: "{{ asdf_env }}"
+  loop: "{{ asdf_tools.keys() | difference(asdf_plugins.stdout_lines | map('trim')) | sort }}"
+  changed_when: true
+
+# `asdf current` columns: Name Version Source Installed(true/false)
+- name: Find versions that are not installed
+  ansible.builtin.command: asdf current
+  args:
+    chdir: "{{ asdf_tool_versions | dirname }}"
+  environment: "{{ asdf_env }}"
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  register: asdf_current
+  when: asdf_install_versions | bool
+
+- name: Install missing versions
+  ansible.builtin.command:
+    argv: [asdf, install, "{{ item }}", "{{ asdf_tools[item] }}"]
+    chdir: "{{ asdf_tool_versions | dirname }}"
+  environment: "{{ asdf_env }}"
+  # If `asdf current` failed (e.g. plugins only just added in check mode), try them all.
+  loop: >-
+    {{ (asdf_current.stdout | bwhitehead.workstation.asdf_not_installed)
+       if asdf_current.rc | default(1) == 0 else asdf_tools.keys() | sort }}
+  changed_when: true
+  when: asdf_install_versions | bool

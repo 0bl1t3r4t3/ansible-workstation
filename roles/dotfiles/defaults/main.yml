@@ -1,0 +1,16 @@
+---
+dotfiles_repo: https://github.com/0bl1t3r4t3/dotfiles.git
+dotfiles_version: main
+dotfiles_dest: "{{ ansible_facts.user_dir }}/dotfiles"
+# false = clone if missing, never touch an existing checkout; true = fast-forward pull
+dotfiles_update: false
+# Where links are created (passed to stow as --target)
+dotfiles_target: "{{ ansible_facts.user_dir }}"
+# Stow packages (top-level folders) to link; [] = all of them
+dotfiles_packages: []
+# Install git and stow if they are missing
+dotfiles_install_deps: true
+# Real files in $HOME that a link would replace (e.g. a distro's stock ~/.bashrc)
+# are moved here first. false = stop and report them instead.
+dotfiles_backup_conflicts: true
+dotfiles_backup_dir: "{{ dotfiles_target }}/.dotfiles-backup/{{ ansible_facts.date_time.iso8601_basic_short }}"

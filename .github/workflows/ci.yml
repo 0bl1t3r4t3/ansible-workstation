@@ -1,0 +1,45 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install ansible-core ansible-lint pytest
+      - run: ./scripts/dev-setup.sh
+      - run: ansible-lint
+      - run: python -m pytest -q tests/unit
+      - run: shellcheck scripts/*.sh tests/ci/*.sh
+
+  linux:
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ["debian:12", "ubuntu:24.04", "fedora:41", "archlinux:latest"]
+    container: ${{ matrix.image }}
+    steps:
+      - name: Prepare container
+        run: |
+          # checkout needs git; prepare script installs the rest
+          (command -v apt-get && apt-get update -qq && apt-get install -y -qq git) ||
+          (command -v dnf && dnf install -y -q git) ||
+          (command -v pacman && pacman -Sy --noconfirm git) || true
+      - uses: actions/checkout@v4
+      - run: tests/ci/prepare-linux.sh
+      - run: PATH=/opt/ansible/bin:$PATH tests/ci/run.sh
+
+  macos:
+    needs: lint
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install ansible
+      - run: tests/ci/run.sh

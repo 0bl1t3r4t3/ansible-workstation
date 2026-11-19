@@ -1,0 +1,43 @@
+---
+- name: List files in the stow packages
+  ansible.builtin.find:
+    paths: "{{ dotfiles_stow | map('regex_replace', '^', dotfiles_dest ~ '/') | list }}"
+    recurse: true
+    hidden: true
+    file_type: any
+  register: dotfiles_files
+
+- name: Check the matching paths in $HOME
+  ansible.builtin.stat:
+    path: "{{ dotfiles_target }}/{{ item.path | regex_replace('^' ~ (dotfiles_dest | regex_escape) ~ '/[^/]+/', '') }}"
+  loop: "{{ dotfiles_files.files | rejectattr('isdir') }}"
+  loop_control:
+    label: "{{ item.path | regex_replace('^' ~ (dotfiles_dest | regex_escape) ~ '/', '') }}"
+  register: dotfiles_targets
+
+- name: Choose files to back up
+  ansible.builtin.set_fact:
+    dotfiles_conflicts: >-
+      {{ dotfiles_targets.results | selectattr('stat.exists')
+         | rejectattr('stat.islnk') | map(attribute='stat.path') | list }}
+
+- name: Create backup folder
+  ansible.builtin.file:
+    path: "{{ dotfiles_backup_dir }}"
+    state: directory
+    mode: "0700"
+  when: dotfiles_conflicts | length > 0
+
+- name: Move conflicting files to the backup folder
+  ansible.builtin.command:
+    argv:
+      - /bin/sh
+      - -c
+      - 'rel=${1#"$HOME"/}; mkdir -p "$2/$(dirname "$rel")" && mv -n "$1" "$2/$rel"'
+      - backup
+      - "{{ item }}"
+      - "{{ dotfiles_backup_dir }}"
+  environment:
+    HOME: "{{ dotfiles_target }}"
+  loop: "{{ dotfiles_conflicts }}"
+  changed_when: true

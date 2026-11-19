@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  author: Brian Whitehead
+  description: Apply macOS user defaults and restart the affected apps.
+  license: MIT
+  min_ansible_version: "2.16"
+  platforms:
+    - {name: macOS, versions: [all]}
+dependencies: []

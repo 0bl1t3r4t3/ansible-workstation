@@ -1,0 +1,27 @@
+---
+- name: Check for starship
+  ansible.builtin.shell: command -v starship || test -x "{{ shell_bin_dir }}/starship"
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  register: shell_starship_found
+
+- name: Install starship release binary
+  when: shell_starship_found.rc != 0
+  block:
+    - name: Create {{ shell_bin_dir }}
+      ansible.builtin.file:
+        path: "{{ shell_bin_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Download and unpack starship
+      ansible.builtin.unarchive:
+        src: >-
+          https://github.com/starship/starship/releases/latest/download/starship-{{
+          'aarch64' if ansible_facts.architecture in ['aarch64', 'arm64'] else 'x86_64'
+          }}-unknown-linux-musl.tar.gz
+        dest: "{{ shell_bin_dir }}"
+        remote_src: true
+        creates: "{{ shell_bin_dir }}/starship"
+        mode: "0755"

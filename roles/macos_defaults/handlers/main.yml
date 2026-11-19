@@ -1,0 +1,9 @@
+---
+- name: Restart affected macOS apps
+  ansible.builtin.command:
+    argv: [killall, "{{ item }}"]
+  loop: >-
+    {{ macos_defaults_result.results | selectattr('changed')
+       | map(attribute='item.restart') | select('defined') | flatten | unique }}
+  changed_when: true
+  failed_when: false
