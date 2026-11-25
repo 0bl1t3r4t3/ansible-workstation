@@ -1,0 +1,28 @@
+---
+- name: Check for secret-file templates in the dotfiles repo
+  ansible.builtin.stat:
+    path: "{{ dotfiles_dest }}/{{ item.src }}"
+  loop: "{{ dotfiles_templates }}"
+  loop_control:
+    label: "{{ item.src }}"
+  register: dotfiles_template_src
+
+- name: Copy secret-file templates that are not in place yet
+  ansible.builtin.copy:
+    src: "{{ dotfiles_dest }}/{{ item.item.src }}"
+    dest: "{{ dotfiles_target }}/{{ item.item.dest }}"
+    remote_src: true
+    force: false
+    mode: "{{ dotfiles_template_mode }}"
+  loop: "{{ dotfiles_template_src.results | selectattr('stat.exists') }}"
+  loop_control:
+    label: "{{ item.item.dest }}"
+
+- name: Restrict permissions on secret files
+  ansible.builtin.file:
+    path: "{{ dotfiles_target }}/{{ item.item.dest }}"
+    state: file
+    mode: "{{ dotfiles_template_mode }}"
+  loop: "{{ dotfiles_template_src.results | selectattr('stat.exists') }}"
+  loop_control:
+    label: "{{ item.item.dest }}"

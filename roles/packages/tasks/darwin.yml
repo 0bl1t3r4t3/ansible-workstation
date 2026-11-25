@@ -20,10 +20,10 @@
 
 - name: Install Homebrew formulae
   community.general.homebrew:
-    name: "{{ (packages_resolved + packages_homebrew_formulae) | unique }}"
+    name: "{{ (packages_resolved + packages_homebrew_formulae + packages_homebrew_pinned) | unique }}"
     state: "{{ packages_state }}"
     path: "{{ packages_homebrew_prefix }}/bin"
-  when: (packages_resolved + packages_homebrew_formulae) | length > 0
+  when: (packages_resolved + packages_homebrew_formulae + packages_homebrew_pinned) | length > 0
 
 - name: Install Homebrew casks
   community.general.homebrew_cask:
@@ -31,3 +31,21 @@
     state: "{{ 'upgraded' if packages_upgrade | bool else 'present' }}"
     path: "{{ packages_homebrew_prefix }}/bin"
   when: packages_homebrew_casks | length > 0
+
+# Pinned formulae are skipped by `brew upgrade`. Use it for libraries that
+# source-built formulae link against (e.g. tree-sitter for emacs-plus), where an
+# upgrade breaks the app until it is rebuilt. Pins are added, never removed.
+- name: List pinned Homebrew formulae
+  ansible.builtin.command:
+    argv: ["{{ packages_homebrew_prefix }}/bin/brew", list, --pinned]
+  register: packages_brew_pinned_now
+  changed_when: false
+  check_mode: false
+  when: packages_homebrew_pinned | length > 0
+
+- name: Pin Homebrew formulae
+  ansible.builtin.command:
+    argv: ["{{ packages_homebrew_prefix }}/bin/brew", pin, "{{ item }}"]
+  loop: "{{ packages_homebrew_pinned | difference(packages_brew_pinned_now.stdout_lines | default([])) }}"
+  changed_when: true
+  when: packages_homebrew_pinned | length > 0

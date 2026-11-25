@@ -8,6 +8,8 @@ dotfiles_update: false
 dotfiles_target: "{{ ansible_facts.user_dir }}"
 # Stow packages (top-level folders) to link; [] = all of them
 dotfiles_packages: []
+# Top-level folders that are never stowed when dotfiles_packages is []
+dotfiles_stow_exclude: [templates]
 # Install git and stow if they are missing
 dotfiles_install_deps: true
 # Real files in $HOME that a link would replace (e.g. a distro's stock ~/.bashrc)
@@ -38,3 +40,12 @@ dotfiles_windows_packages: [git, bash, powershell, starship]
 dotfiles_windows_dest: "{{ ansible_facts.env.USERPROFILE | default('') }}\\dotfiles"
 dotfiles_windows_target: "{{ ansible_facts.env.USERPROFILE | default('') }}"
 dotfiles_windows_git: 'C:\Program Files\Git\cmd\git.exe'
+
+# Secret-file templates from the dotfiles repo (macOS / Linux). Each one is copied
+# to dest (relative to dotfiles_target) only when dest doesn't exist yet, so a
+# filled-in file is never overwritten. Existing dest files are set to
+# dotfiles_template_mode. A template missing from the repo is skipped.
+dotfiles_templates:
+  - {src: templates/authinfo.example, dest: .authinfo}   # Emacs auth-source (gptel keys)
+  - {src: templates/awsrc.example, dest: .awsrc}         # AWS CLI env vars
+dotfiles_template_mode: "0600"

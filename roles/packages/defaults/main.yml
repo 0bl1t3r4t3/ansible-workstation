@@ -14,6 +14,9 @@ packages_homebrew_prefix: "{{ '/opt/homebrew' if ansible_facts.architecture == '
 packages_homebrew_taps: []
 packages_homebrew_formulae: []
 packages_homebrew_casks: []
+# Formulae to `brew pin` (installed first if missing). To upgrade one later:
+#   brew unpin <name> && brew upgrade <name> && brew pin <name>
+packages_homebrew_pinned: []
 
 # Linux native packages, in addition to packages_common
 packages_linux: []      # any distro

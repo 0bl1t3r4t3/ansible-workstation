@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+- packages: `packages_homebrew_pinned` — `brew pin` formulae so upgrades skip them
+  (inventory pins tree-sitter, which emacs-plus@31 links against).
+- dotfiles: copy secret-file templates (`templates/authinfo.example`, `templates/awsrc.example`)
+  into place when missing, owner-only; `dotfiles_stow_exclude` keeps `templates/` from being stowed.
+
 ## 0.2.0 (2026-11-19)
 - Windows support: winget packages, dotfiles linking, PowerShell profile + Windows
   Terminal, new `windows_settings` and `wsl` roles, `bootstrap.ps1` / `bootstrap-wsl.sh`.

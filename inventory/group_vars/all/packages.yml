@@ -39,6 +39,14 @@ packages_homebrew_taps:
   - openai/tools
 
 # Everything else installed on request on the main Mac (Nov 2026). Prune freely.
+# Held back from `brew upgrade`. tree-sitter: emacs-plus@31 is built from source
+# and links to the installed version, so an upgrade stops Emacs from starting.
+# To upgrade: brew unpin tree-sitter && brew upgrade tree-sitter &&
+#   brew reinstall emacs-plus@31 && brew pin tree-sitter
+#   (then copy Emacs.app to /Applications and run `doom sync --rebuild`)
+packages_homebrew_pinned:
+  - tree-sitter
+
 packages_homebrew_formulae:
   - actionlint
   - aescrypt

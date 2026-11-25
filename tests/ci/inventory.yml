@@ -8,6 +8,7 @@ all:
   vars:
     packages_common: [bash, bash-completion, git, stow, jq, ripgrep, fd, shellcheck, coreutils]
     packages_homebrew_formulae: [starship]
+    packages_homebrew_pinned: [starship]
     dotfiles_repo: /tmp/dotfiles-fixture
     asdf_plugin_urls:
       shfmt: https://github.com/luizm/asdf-shfmt.git

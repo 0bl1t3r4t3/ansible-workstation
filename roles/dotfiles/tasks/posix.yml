@@ -38,6 +38,7 @@
     paths: "{{ dotfiles_dest }}"
     file_type: directory
     hidden: false
+    excludes: "{{ dotfiles_stow_exclude }}"
   register: dotfiles_found
   when: dotfiles_packages | length == 0
 
@@ -93,3 +94,7 @@
     dest: "{{ dotfiles_target }}/.config/git/os.gitconfig"
     content: "{{ dotfiles_git_os_header }}{{ dotfiles_git_os_config[ansible_facts.os_family] | default(dotfiles_git_os_config['default']) }}"
     mode: "0644"
+
+- name: Put secret-file templates in place
+  ansible.builtin.include_tasks: templates.yml
+  when: dotfiles_templates | length > 0

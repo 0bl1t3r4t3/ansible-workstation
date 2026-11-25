@@ -47,8 +47,8 @@ configures Windows over SSH, plus the WSL Linux environment, in one run):
 
 | Role | Does | Key variables |
 |---|---|---|
-| `packages` | Homebrew taps/formulae/casks (macOS); apt/dnf/pacman/zypper + Flatpak (Linux); winget (Windows) | `packages_common` (generic names, translated per OS), `packages_homebrew_*`, `packages_debian` / `_redhat` / `_archlinux`, `packages_flatpaks`, `packages_winget`, `packages_upgrade` |
-| `dotfiles` | Clones the dotfiles repo, backs up files that are in the way, links it (GNU Stow; a PowerShell equivalent on Windows); writes per-OS git settings | `dotfiles_repo`, `dotfiles_packages`, `dotfiles_windows_packages`, `dotfiles_update`, `dotfiles_git_token`, `dotfiles_git_os_config` |
+| `packages` | Homebrew taps/formulae/casks and pins (macOS); apt/dnf/pacman/zypper + Flatpak (Linux); winget (Windows) | `packages_common` (generic names, translated per OS), `packages_homebrew_*`, `packages_debian` / `_redhat` / `_archlinux`, `packages_flatpaks`, `packages_winget`, `packages_upgrade` |
+| `dotfiles` | Clones the dotfiles repo, backs up files that are in the way, links it (GNU Stow; a PowerShell equivalent on Windows); writes per-OS git settings; copies secret-file templates (`~/.authinfo`, `~/.awsrc`) into place if missing | `dotfiles_repo`, `dotfiles_packages`, `dotfiles_templates`, `dotfiles_windows_packages`, `dotfiles_update`, `dotfiles_git_token`, `dotfiles_git_os_config` |
 | `shell` | Login shell (Homebrew bash on macOS), Starship on Linux; on Windows: `$PROFILE` loads the dotfiles PowerShell profile, Windows Terminal defaults to PowerShell 7 + Nerd Font | `shell_login`, `shell_starship`, `shell_windows_terminal*` |
 | `asdf` | Installs asdf, the plugins and every version in `~/.tool-versions` (not on Windows; WSL gets it) | `asdf_plugin_urls`, `asdf_install_versions`, `asdf_version` (Linux) |
 | `macos_defaults` | `defaults write` settings, restarts Dock/Finder when needed | `macos_defaults_settings` |

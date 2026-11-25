@@ -17,4 +17,10 @@ test -L "${home}/.bashrc" || { echo "${home}/.bashrc is not linked" >&2; exit 1;
 test -d "${home}/.asdf/installs/shfmt/3.12.0" || { echo "asdf did not install shfmt" >&2; exit 1; }
 # Run from home, where ~/.tool-versions pins the version.
 (cd "${home}" && PATH=${home}/.local/bin:/opt/homebrew/bin:${PATH} ASDF_DATA_DIR=${home}/.asdf "${home}/.asdf/shims/shfmt" --version)
+# Template copied and owner-only; templates/ itself is not stowed.
+test "$(stat -c %a "${home}/.authinfo" 2>/dev/null || stat -f %Lp "${home}/.authinfo")" = 600 || { echo "${home}/.authinfo missing or not 600" >&2; exit 1; }
+test ! -e "${home}/authinfo.example" || { echo "templates/ was stowed" >&2; exit 1; }
+if [[ $(uname) == Darwin ]]; then
+  brew list --pinned | grep -qx starship || { echo "starship is not pinned" >&2; exit 1; }
+fi
 echo "CI OK"
