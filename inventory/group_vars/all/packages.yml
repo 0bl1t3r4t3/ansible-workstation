@@ -30,191 +30,27 @@ packages_name_map:
   gitleaks: {Debian: "", RedHat: ""}
   starship: {Debian: "", RedHat: "", Archlinux: starship, Suse: ""}
 
-packages_homebrew_taps:
-  - cirruslabs/cli
-  - d12frosted/emacs-plus
-  - hashicorp/tap
-  - minacle/chntpw
-  - oktadev/tap
-  - openai/tools
+# Package groups to install (defined in package_groups.yml). This default is a
+# development / sysadmin workstation. Add groups per machine in its own vars,
+# e.g. inventory/local.yml:  packages_groups: [core, editors, dev, ..., media]
+# Available: core, editors, dev, docs, sysadmin, cloud, virt, security, data,
+#            media, personal
+packages_groups:
+  - core
+  - editors
+  - dev
+  - docs
+  - sysadmin
+  - cloud
+  - virt
 
-# Everything else installed on request on the main Mac (Nov 2026). Prune freely.
-# Held back from `brew upgrade`. tree-sitter: emacs-plus@31 is built from source
-# and links to the installed version, so an upgrade stops Emacs from starting.
-# To upgrade: brew unpin tree-sitter && brew upgrade tree-sitter &&
-#   brew reinstall emacs-plus@31 && brew pin tree-sitter
-#   (then copy Emacs.app to /Applications and run `doom sync --rebuild`)
-packages_homebrew_pinned:
-  - tree-sitter
-
-packages_homebrew_formulae:
-  - actionlint
-  - aescrypt
-  - ansible
-  - ansible-builder
-  - ansible-creator
-  - ansible-language-server
-  - ansible-lint
-  - aria2
-  - ascii
-  - ascii2binary
-  - asciidoctor
-  - asciidoctorj
-  - asciinema
-  - asciiquarium
-  - asciitex
-  - asdf
-  - automake
-  - awscli
-  - bash-preexec
-  - bash-snippets
-  - bash_unit
-  - bashate
-  - bashdb
-  - bashish
-  - bashunit
-  - bat-extras
-  - bcrypt
-  - beecrypt
-  - bison
-  - bitwarden-cli
-  - black
-  - buku
-  - cabal-install
-  - cabextract
-  - ccrypt
-  - cdrtools
-  - certbot
-  - cfonts
-  - chruby
-  - cirruslabs/cli/sshpass
-  - cmake
-  - cmake-docs
-  - cosign
-  - cpplint
-  - csvkit
-  - cython
-  - d12frosted/emacs-plus/emacs-plus@31
-  - ditaa
-  - dos2unix
-  - dotenv-linter
-  - extra-cmake-modules
-  - ffmpeg-full
-  - flake8
-  - gh
-  - git-annex
-  - git-gui
-  - git-standup
-  - gnuplot
-  - golangci-lint
-  - gomodifytags
-  - googletest
-  - gopls
-  - gotests
-  - groff
-  - hadolint
-  - hashicorp/tap/consul
-  - hashicorp/tap/packer
-  - hashicorp/tap/vault
-  - hlint
-  - httping
-  - hunspell
-  - incus
-  - ipcalc
-  - ipython
-  - isort
-  - jinja2-cli
-  - jsonlint
-  - jupyterlab
-  - kube-linter
-  - ls-lint
-  - lsusb
-  - mailutils
-  - markdown
-  - mermaid-cli
-  - micro
-  - minacle/chntpw/chntpw
-  - multi-git-status
-  - ncftp
-  - neovim-qt
-  - nerdfix
-  - net-snmp
-  - nmap
-  - octave
-  - openai/tools/tart
-  - opentofu
-  - pandoc-crossref
-  - pandoc-plot
-  - pandocomatic
-  - pipenv
-  - plantuml
-  - pngpaste
-  - poetry
-  - poppler
-  - pre-commit
-  - proselint
-  - protolint
-  - pstree
-  - pyenv-virtualenvwrapper
-  - pylint
-  - pyright
-  - python-packaging
-  - python-setuptools
+# Uninstalled wherever this runs (security or superseded):
+packages_homebrew_absent:
+  - telnet                     # cleartext logins; use ssh, or `nc` for port checks
+  - ncftp                      # cleartext FTP; use sftp / scp / rsync
+  - cirruslabs/cli/sshpass     # passwords on the command line; use SSH keys
+  - minacle/chntpw/chntpw      # Windows password-reset tool; not a workstation tool
+  - bcrypt                     # Blowfish file encryption, unmaintained; use age or gpg
+  - beecrypt                   # crypto library, unmaintained since 2009
+  - python@3.12                # keep only the newest Python + one prior (3.15, 3.14)
   - python@3.11
-  - python@3.12
-  - ripgrep-all
-  - rmlint
-  - rst-lint
-  - rust
-  - scrypt
-  - serf
-  - shellspec
-  - sntop
-  - splint
-  - sql-lint
-  - stylelint
-  - subnetcalc
-  - subversion
-  - swiftlint
-  - swig
-  - tcping
-  - telnet
-  - tfproviderlint
-  - tig
-  - tmux-mem-cpu-load
-  - tmux-xpanes
-  - tmuxinator
-  - tmuxp
-  - uv
-  - virtualenvwrapper
-  - weasyprint
-  - wimlib
-  - xsel
-  - yara
-  - zeek
-  - zsh-completions
-
-packages_homebrew_casks:
-  - 1password-cli
-  - blackhole-2ch
-  - cisdem-duplicate-finder
-  - cloudflare-warp
-  - db-browser-for-sqlite
-  - docker
-  - docker-desktop
-  - duplicate-annihilator-for-photos
-  - duplicate-file-finder
-  - duplicateaudiofinder
-  - font-azeret-mono
-  - gpgfrontend
-  - hashicorp-vagrant
-  - macgpt
-  - mactex
-  - miniconda
-  - obs
-  - okta
-  - prince
-  - raycast
-  - ssh-config-editor
-  - vimr
-  - warp

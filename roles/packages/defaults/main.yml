@@ -1,4 +1,11 @@
 ---
+# Package groups: named sets that can be switched on per machine. Each group may
+# set any of: description, common, homebrew_taps, homebrew_formulae,
+# homebrew_casks, homebrew_pinned, linux, flatpaks, winget. An enabled group's
+# lists are added to the matching packages_* lists below.
+packages_group_definitions: {}
+packages_groups: []
+
 # Cross-OS packages by generic name; translated per OS family through
 # packages_default_name_map (vars/main.yml) merged with packages_name_map.
 packages_common: []
@@ -17,6 +24,8 @@ packages_homebrew_casks: []
 # Formulae to `brew pin` (installed first if missing). To upgrade one later:
 #   brew unpin <name> && brew upgrade <name> && brew pin <name>
 packages_homebrew_pinned: []
+# Formulae to uninstall (e.g. insecure or superseded tools). Runs before installs.
+packages_homebrew_absent: []
 
 # Linux native packages, in addition to packages_common
 packages_linux: []      # any distro

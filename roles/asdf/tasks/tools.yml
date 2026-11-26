@@ -2,6 +2,8 @@
 - name: Parse tool versions
   ansible.builtin.set_fact:
     asdf_tools: "{{ asdf_file.content | b64decode | bwhitehead.workstation.parse_tool_versions }}"
+    # Every version on each line (e.g. `python 3.15.2 3.14.10`), not just the default
+    asdf_tool_pairs: "{{ asdf_file.content | b64decode | bwhitehead.workstation.tool_version_pairs }}"
 
 - name: List installed plugins
   ansible.builtin.command: asdf plugin list
@@ -21,20 +23,20 @@
 # Check install folders directly: asdf's `current`/`list` output changes between versions.
 - name: Check which versions are installed
   ansible.builtin.stat:
-    path: "{{ asdf_data_dir }}/installs/{{ item.key }}/{{ item.value }}"
-  loop: "{{ asdf_tools | dict2items }}"
+    path: "{{ asdf_data_dir }}/installs/{{ item.tool }}/{{ item.version }}"
+  loop: "{{ asdf_tool_pairs }}"
   loop_control:
-    label: "{{ item.key }} {{ item.value }}"
+    label: "{{ item.tool }} {{ item.version }}"
   register: asdf_installed
   when: asdf_install_versions | bool
 
 - name: Install missing versions
   ansible.builtin.command:
-    argv: [asdf, install, "{{ item.item.key }}", "{{ item.item.value }}"]
+    argv: [asdf, install, "{{ item.item.tool }}", "{{ item.item.version }}"]
     chdir: "{{ asdf_tool_versions | dirname }}"
   environment: "{{ asdf_env }}"
   loop: "{{ asdf_installed.results | rejectattr('skipped', 'defined') | rejectattr('stat.exists') }}"
   loop_control:
-    label: "{{ item.item.key }} {{ item.item.value }}"
+    label: "{{ item.item.tool }} {{ item.item.version }}"
   changed_when: true
   when: asdf_install_versions | bool

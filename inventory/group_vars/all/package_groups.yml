@@ -1,0 +1,230 @@
+---
+# Package groups. Switch them on per machine with packages_groups (packages.yml,
+# or a host's own vars, e.g. inventory/local.yml). Each package is in one group.
+# Keys: description, common (any OS, generic names), homebrew_taps,
+# homebrew_formulae, homebrew_casks, homebrew_pinned, linux, flatpaks, winget.
+packages_group_definitions:
+
+  core:
+    description: Terminal essentials for every workstation
+    homebrew_formulae:
+      - asdf
+      - gnupg
+      - age
+      - gh
+      - tig
+      - git-gui
+      - multi-git-status
+      - git-standup
+      - tmux
+      - tmuxinator
+      - tmuxp
+      - tmux-xpanes
+      - tmux-mem-cpu-load
+      - micro
+      - dos2unix
+      - pstree
+      - bat-extras
+      - ripgrep-all
+      - rmlint
+      - aria2
+      - lsusb
+      - pngpaste
+      - bash-preexec
+      - zsh-completions
+      - nerdfix
+      - asciinema
+      - bitwarden-cli
+    homebrew_casks:
+      - 1password-cli
+      - gpgfrontend
+      - font-azeret-mono
+
+  editors:
+    description: Emacs (Doom), Neovim GUIs, spell checking
+    homebrew_taps: [d12frosted/emacs-plus]
+    homebrew_formulae:
+      - d12frosted/emacs-plus/emacs-plus@31
+      - hunspell
+      - neovim-qt
+    # emacs-plus@31 is built from source and links to the installed tree-sitter,
+    # so a tree-sitter upgrade stops Emacs from starting. To upgrade:
+    #   brew unpin tree-sitter && brew upgrade tree-sitter &&
+    #   brew reinstall emacs-plus@31 && brew pin tree-sitter
+    #   (then copy Emacs.app to /Applications and run `doom sync --rebuild`)
+    homebrew_pinned: [tree-sitter]
+    homebrew_casks: [vimr]
+
+  dev:
+    description: Languages, build tools, linters and test frameworks
+    homebrew_formulae:
+      # Python: newest release + the one before it (asdf manages project versions)
+      - python@3.15
+      - python@3.14
+      - uv
+      - poetry
+      - pipenv
+      - virtualenvwrapper
+      - python-packaging
+      - python-setuptools
+      - cython
+      - ipython
+      - black
+      - flake8
+      - isort
+      - pylint
+      - pyright
+      - jinja2-cli
+      # Go, Rust, Haskell, C/C++
+      - gopls
+      - golangci-lint
+      - gomodifytags
+      - gotests
+      - rust
+      - cabal-install
+      - hlint
+      - cmake
+      - cmake-docs
+      - extra-cmake-modules
+      - automake
+      - bison
+      - swig
+      - googletest
+      - cpplint
+      - splint
+      # Shell
+      - bashate
+      - bash_unit
+      - bashunit
+      - shellspec
+      - bashdb
+      # Linters and hooks
+      - pre-commit
+      - actionlint
+      - hadolint
+      - dotenv-linter
+      - jsonlint
+      - ls-lint
+      - protolint
+      - rst-lint
+      - sql-lint
+      - stylelint
+      - swiftlint
+      - proselint
+      - markdown
+      - subversion
+
+  docs:
+    description: Writing and diagrams (AsciiDoc, Pandoc, PlantUML, LaTeX)
+    homebrew_formulae:
+      - asciidoctor
+      - asciidoctorj
+      - pandoc-crossref
+      - pandoc-plot
+      - pandocomatic
+      - mermaid-cli
+      - plantuml
+      - ditaa
+      - gnuplot
+      - weasyprint
+      - groff
+      - poppler
+    homebrew_casks:
+      - mactex
+      - prince
+
+  sysadmin:
+    description: Ansible, networking and certificates
+    homebrew_formulae:
+      - ansible
+      - ansible-lint
+      - ansible-builder
+      - ansible-creator
+      - ansible-language-server
+      - nmap
+      - httping
+      - tcping
+      - ipcalc
+      - subnetcalc
+      - sntop
+      - net-snmp
+      - mailutils
+      - certbot
+      - wimlib
+      - cabextract
+    homebrew_casks:
+      - ssh-config-editor
+
+  cloud:
+    description: AWS, OpenTofu, HashiCorp tools, Kubernetes linting, Okta
+    homebrew_taps: [hashicorp/tap, oktadev/tap]
+    homebrew_formulae:
+      - awscli
+      - opentofu
+      - tfproviderlint
+      - hashicorp/tap/packer
+      - hashicorp/tap/vault
+      - hashicorp/tap/consul
+      - serf
+      - cosign
+      - kube-linter
+    homebrew_casks:
+      - okta
+      - cloudflare-warp
+
+  virt:
+    description: Containers and VMs (Docker Desktop, Vagrant, Incus, Tart)
+    homebrew_taps: [openai/tools]
+    homebrew_formulae:
+      - incus
+      - openai/tools/tart
+    homebrew_casks:
+      - docker-desktop
+      - hashicorp-vagrant
+
+  security:
+    description: Traffic analysis, malware rules, file encryption
+    homebrew_formulae:
+      - zeek
+      - yara
+      - scrypt
+      - aescrypt
+
+  data:
+    description: Notebooks, numerics and data wrangling
+    homebrew_formulae:
+      - jupyterlab
+      - octave
+      - csvkit
+    homebrew_casks:
+      - db-browser-for-sqlite
+      - miniconda
+
+  media:
+    description: Audio/video recording and conversion
+    homebrew_formulae:
+      - ffmpeg-full
+    homebrew_casks:
+      - blackhole-2ch
+      - obs
+
+  personal:
+    description: Desktop utilities and fun terminal toys
+    homebrew_formulae:
+      - buku
+      - git-annex
+      - ascii
+      - ascii2binary
+      - asciitex
+      - asciiquarium
+      - cfonts
+      - bash-snippets
+      - bashish
+    homebrew_casks:
+      - raycast
+      - warp
+      - macgpt
+      - cisdem-duplicate-finder
+      - duplicate-file-finder
+      - duplicate-annihilator-for-photos
+      - duplicateaudiofinder

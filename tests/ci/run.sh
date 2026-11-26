@@ -14,7 +14,7 @@ grep -Eq 'changed=0 +unreachable=0 +failed=0' /tmp/run2.log || { echo "Not idemp
 # The playbook uses the account's real home; CI containers point $HOME elsewhere.
 home=$(python3 -c 'import os, pwd; print(pwd.getpwuid(os.getuid()).pw_dir)')
 test -L "${home}/.bashrc" || { echo "${home}/.bashrc is not linked" >&2; exit 1; }
-test -d "${home}/.asdf/installs/shfmt/3.12.0" || { echo "asdf did not install shfmt" >&2; exit 1; }
+for v in 3.12.0 3.11.0; do test -d "${home}/.asdf/installs/shfmt/${v}" || { echo "asdf did not install shfmt ${v}" >&2; exit 1; }; done
 # Run from home, where ~/.tool-versions pins the version.
 (cd "${home}" && PATH=${home}/.local/bin:/opt/homebrew/bin:${PATH} ASDF_DATA_DIR=${home}/.asdf "${home}/.asdf/shims/shfmt" --version)
 # Template copied and owner-only; templates/ itself is not stowed.
@@ -23,4 +23,6 @@ test ! -e "${home}/authinfo.example" || { echo "templates/ was stowed" >&2; exit
 if [[ $(uname) == Darwin ]]; then
   brew list --pinned | grep -qx starship || { echo "starship is not pinned" >&2; exit 1; }
 fi
+command -v jq >/dev/null || { echo "jq (from the ci group) is missing" >&2; exit 1; }
+! command -v cowsay >/dev/null || { echo "cowsay (disabled group) was installed" >&2; exit 1; }
 echo "CI OK"

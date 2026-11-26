@@ -6,9 +6,13 @@ all:
       ansible_connection: local
       ansible_python_interpreter: "{{ ansible_playbook_python }}"
   vars:
-    packages_common: [bash, bash-completion, git, stow, jq, ripgrep, fd, shellcheck, coreutils]
-    packages_homebrew_formulae: [starship]
-    packages_homebrew_pinned: [starship]
+    packages_common: [bash, bash-completion, git, stow, ripgrep, fd, shellcheck, coreutils]
+    # Exercise package groups: jq comes from an enabled group, nothing from the disabled one.
+    packages_group_definitions:
+      ci: {common: [jq], homebrew_formulae: [starship], homebrew_pinned: [starship]}
+      unused: {common: [cowsay], homebrew_formulae: [cowsay]}
+    packages_groups: [ci]
+    packages_homebrew_absent: [telnet]
     dotfiles_repo: /tmp/dotfiles-fixture
     asdf_plugin_urls:
       shfmt: https://github.com/luizm/asdf-shfmt.git

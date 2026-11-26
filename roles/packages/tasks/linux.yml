@@ -9,7 +9,7 @@
 - name: Collect native packages
   ansible.builtin.set_fact:
     packages_native: >-
-      {{ (packages_resolved + packages_linux
+      {{ (packages_resolved + packages_all.linux
           + lookup('vars', 'packages_' ~ ansible_facts.os_family | lower, default=[])) | unique }}
 
 - name: Install native packages
@@ -20,7 +20,7 @@
   when: packages_native | length > 0
 
 - name: Install Flatpak apps
-  when: packages_flatpaks | length > 0
+  when: packages_all.flatpaks | length > 0
   block:
     - name: Install flatpak
       ansible.builtin.package:
@@ -35,7 +35,7 @@
 
     - name: Install Flatpaks
       community.general.flatpak:
-        name: "{{ packages_flatpaks }}"
+        name: "{{ packages_all.flatpaks }}"
         remote: "{{ packages_flatpak_remote }}"
         method: user
         state: "{{ 'latest' if packages_upgrade | bool else 'present' }}"

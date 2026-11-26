@@ -47,7 +47,7 @@ configures Windows over SSH, plus the WSL Linux environment, in one run):
 
 | Role | Does | Key variables |
 |---|---|---|
-| `packages` | Homebrew taps/formulae/casks and pins (macOS); apt/dnf/pacman/zypper + Flatpak (Linux); winget (Windows) | `packages_common` (generic names, translated per OS), `packages_homebrew_*`, `packages_debian` / `_redhat` / `_archlinux`, `packages_flatpaks`, `packages_winget`, `packages_upgrade` |
+| `packages` | Package groups you switch on per machine; Homebrew taps/formulae/casks, pins and removals (macOS); apt/dnf/pacman/zypper + Flatpak (Linux); winget (Windows) | `packages_groups` + `packages_group_definitions`, `packages_common` (generic names, translated per OS), `packages_homebrew_*` (incl. `_pinned`, `_absent`), `packages_debian` / `_redhat` / `_archlinux`, `packages_flatpaks`, `packages_winget`, `packages_upgrade` |
 | `dotfiles` | Clones the dotfiles repo, backs up files that are in the way, links it (GNU Stow; a PowerShell equivalent on Windows); writes per-OS git settings; copies secret-file templates (`~/.authinfo`, `~/.awsrc`) into place if missing | `dotfiles_repo`, `dotfiles_packages`, `dotfiles_templates`, `dotfiles_windows_packages`, `dotfiles_update`, `dotfiles_git_token`, `dotfiles_git_os_config` |
 | `shell` | Login shell (Homebrew bash on macOS), Starship on Linux; on Windows: `$PROFILE` loads the dotfiles PowerShell profile, Windows Terminal defaults to PowerShell 7 + Nerd Font | `shell_login`, `shell_starship`, `shell_windows_terminal*` |
 | `asdf` | Installs asdf, the plugins and every version in `~/.tool-versions` (not on Windows; WSL gets it) | `asdf_plugin_urls`, `asdf_install_versions`, `asdf_version` (Linux) |
@@ -59,9 +59,22 @@ Defaults are in each `roles/*/defaults/main.yml`.
 
 ## My profile
 `inventory/group_vars/all/` holds the settings for my machines:
-- `packages.yml` - cross-OS CLI tools, plus every Homebrew formula/cask/tap on the main Mac (Nov 2026).
+- `packages.yml` - cross-OS CLI tools, which package groups are on (default: a
+  development / sysadmin workstation), and formulae to uninstall (insecure or superseded).
+- `package_groups.yml` - the groups: `core`, `editors`, `dev`, `docs`, `sysadmin`,
+  `cloud`, `virt` (on by default) and `security`, `data`, `media`, `personal` (opt-in).
 - `asdf.yml` - plugin URLs. Versions come from `~/.tool-versions` in the dotfiles repo.
 - `../windows.yml` - winget apps, dark mode + file extensions, WSL with mirrored networking.
+
+To change the groups for one machine, set `packages_groups` in its own vars, e.g. in
+`inventory/local.yml` (git-ignored):
+
+```yaml
+all:
+  hosts:
+    localhost:
+      packages_groups: [core, editors, dev, docs, sysadmin, cloud, virt, media, personal]
+```
 
 Generic package names follow Homebrew; `roles/packages/vars/main.yml` maps the
 ones that differ (e.g. `fd` -> `fd-find` on Debian). Map a name to `""` to skip it on an OS.

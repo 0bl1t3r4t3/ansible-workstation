@@ -42,11 +42,64 @@ def parse_tool_versions(text):
     return tools
 
 
+def tool_version_pairs(text):
+    """Every installable ``{tool, version}`` in ``.tool-versions`` content.
+
+    A line may list several versions (``python 3.15.2 3.14.10``): the first is the
+    default, the rest are also installed. ``system``, ``ref:...`` and ``path:...``
+    are not installable and are skipped.
+    """
+    pairs = []
+    for line in (text or "").splitlines():
+        parts = line.split("#", 1)[0].split()
+        for version in parts[1:]:
+            if version == "system" or version.startswith(("ref:", "path:")):
+                continue
+            pair = {"tool": parts[0], "version": version}
+            if pair not in pairs:
+                pairs.append(pair)
+    return pairs
+
+
+PACKAGE_GROUP_KEYS = (
+    "common", "homebrew_taps", "homebrew_formulae", "homebrew_casks",
+    "homebrew_pinned", "linux", "flatpaks", "winget",
+)
+
+
+def package_groups(base, enabled, definitions):
+    """Merge the enabled groups' package lists into base.
+
+    base: {key: [..]} for each of PACKAGE_GROUP_KEYS (missing keys count as []).
+    enabled: group names, in order. definitions: {name: {key: [..], ...}}.
+    Returns {key: [..]} with base entries first, then each group's, de-duplicated.
+    Unknown group names raise an error that lists the defined ones.
+    """
+    definitions = definitions or {}
+    unknown = [g for g in (enabled or []) if g not in definitions]
+    if unknown:
+        raise ValueError(
+            "Unknown package group(s): %s. Defined: %s"
+            % (", ".join(unknown), ", ".join(sorted(definitions)))
+        )
+    out = {}
+    for key in PACKAGE_GROUP_KEYS:
+        merged = []
+        for source in [base or {}] + [definitions[g] for g in (enabled or [])]:
+            for name in source.get(key) or []:
+                if name not in merged:
+                    merged.append(name)
+        out[key] = merged
+    return out
+
+
 class FilterModule:
     """Ansible filter plugin entry point."""
 
     def filters(self):
         return {
             "os_packages": os_packages,
+            "package_groups": package_groups,
             "parse_tool_versions": parse_tool_versions,
+            "tool_version_pairs": tool_version_pairs,
         }

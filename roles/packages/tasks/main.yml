@@ -1,8 +1,18 @@
 ---
+# Each enabled group in packages_groups adds to the matching packages_* lists.
+- name: Merge the enabled package groups
+  ansible.builtin.set_fact:
+    packages_all: >-
+      {{ {'common': packages_common, 'homebrew_taps': packages_homebrew_taps,
+          'homebrew_formulae': packages_homebrew_formulae, 'homebrew_casks': packages_homebrew_casks,
+          'homebrew_pinned': packages_homebrew_pinned, 'linux': packages_linux,
+          'flatpaks': packages_flatpaks, 'winget': packages_winget}
+         | bwhitehead.workstation.package_groups(packages_groups, packages_group_definitions) }}
+
 - name: Resolve package names for {{ ansible_facts.os_family }}
   ansible.builtin.set_fact:
     packages_resolved: >-
-      {{ packages_common | bwhitehead.workstation.os_packages(
+      {{ packages_all.common | bwhitehead.workstation.os_packages(
            ansible_facts.os_family,
            packages_default_name_map | combine(packages_name_map, recursive=true),
            require_mapping=(ansible_facts.os_family == 'Windows')) }}
